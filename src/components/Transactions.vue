@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  AccountId,
-  Client,
-  TransferTransaction,
-  Hbar,
-  Transaction,
-  TransactionId,
-} from "@hashgraph/sdk";
+import { AccountId, Client, TransferTransaction, Hbar } from "@hashgraph/sdk";
 import { Wallet } from "../ledger/wallet";
 import { useWalletStore } from "../stores/wallet";
 
@@ -20,25 +13,19 @@ function handleConnectWallet(): void {
 async function handleVerifyAccount(): Promise<void> {
   const operator = AccountId.fromString(LEDGER_TEST_ACCOUNT);
   const client = Client.forTestnet();
+  const publicKey = await walletStore.wallet?.getPublicKey(0);
+  const signer = walletStore.wallet?.getTransactionSigner(0);
+  client.setOperatorWith(operator, publicKey!, signer!);
 
   const verifyTx = new TransferTransaction()
-    .setTransactionId(TransactionId.generate(operator))
     .addHbarTransfer(operator, Hbar.fromTinybars(0))
     .setMaxTransactionFee(Hbar.fromTinybars(1))
-    .setTransactionMemo(`Verify ${LEDGER_TEST_ACCOUNT}`)
     .freezeWith(client);
 
   console.log(verifyTx);
   console.log(verifyTx.toBytes());
 
-  const signedBytes = await walletStore.wallet?.getTransactionSigner(0)(
-    verifyTx.toBytes()
-  );
-
-  if (signedBytes != null) {
-    const signedTx = Transaction.fromBytes(signedBytes);
-    await signedTx.execute(client);
-  }
+  await verifyTx.execute(client);
 }
 
 function handleCreateAccount(): void {
