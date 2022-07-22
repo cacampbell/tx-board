@@ -1,0 +1,67 @@
+stages:
+  - check
+  - test
+  - deploy
+
+default:
+  image: registry.gitlab.com/launchbadge/launchbadge-operations/ci-image-web:f748867a
+  cache: &default-cache
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - node_modules
+    policy: pull
+
+pnpm-install:
+  stage: .pre
+  cache:
+    <<: *default-cache
+    policy: pull-push
+  script:
+    - pnpm i
+
+format:
+  stage: check
+  script:
+    - pnpm check:fmt
+
+eslint:
+  stage: check
+  script:
+    - pnpm check:eslint
+
+typecheck:
+  stage: check
+  script:
+    - pnpm check:vue
+    - pnpm check:node
+
+unit:
+  stage: test
+  script:
+    - pnpm test:unit
+
+component:
+  stage: test
+  script:
+    - pnpm test:comp
+
+end-to-end:
+  stage: test
+  script:
+    - pnpm test:e2e:ci
+
+# See the README for how to set up Continuous Deployment (CD).
+deploy:
+  stage: deploy
+  only:
+    # Comment these two lines out to test deploying from a branch.
+    refs:
+      - main
+    variables:
+      - $GOOGLE_APPLICATION_CREDENTIALS
+  script:
+    - pnpm build
+    # This will use `GOOGLE_APPLICATION_CREDENTIALS` to deploy.
+    - firebase deploy
