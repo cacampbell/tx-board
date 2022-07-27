@@ -6,7 +6,7 @@ const clockStore = useClockStore();
 
 <template>
   <div
-    class="flex flex-1 flex-col items-center justify-center gap-x-5 bg-serenity font-semibold text-center-stage"
+    class="flex flex-1 flex-col items-center justify-center gap-x-5 bg-grisaille font-semibold text-center-stage"
   >
     <h3 class="pt-10 text-5xl">Transaction Board</h3>
 

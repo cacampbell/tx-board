@@ -17,7 +17,7 @@ module.exports = {
       transparent: "transparent",
       // in the abscence of a designer-provided color palette
       // all colors are named via cherangi: https://www.npmjs.com/package/cherangi
-      serenity: "#91a8d0",
+      grisaille: "#556073",
       "center-stage": "#FF5",
     },
     fontFamily: {

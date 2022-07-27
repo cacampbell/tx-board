@@ -11,6 +11,10 @@ import {
   AccountUpdateTransaction,
   TokenCreateTransaction,
   TokenSupplyType,
+  TokenAssociateTransaction,
+  TokenDissociateTransaction,
+  TokenMintTransaction,
+  TokenBurnTransaction,
 } from "@hashgraph/sdk";
 import { Wallet } from "../ledger/wallet";
 import { useTokenStore } from "../stores/token";
@@ -156,9 +160,19 @@ async function handleTransferToken(): Promise<void> {
   const client = await getClient();
 
   const tokenTransferTx = new TransferTransaction()
-    .addTokenTransfer(tokenId!, AccountId.fromString("0.0.6189"), 10)
-    .addTokenTransfer(tokenId!, client.operatorAccountId!, -10)
-    .setTransactionMemo("Transfer 10 * to 0.0.6189")
+    .addTokenTransferWithDecimals(
+      tokenId!,
+      AccountId.fromString("0.0.6189"),
+      10_172_691,
+      6
+    )
+    .addTokenTransferWithDecimals(
+      tokenId!,
+      client.operatorAccountId!,
+      -10_172_691,
+      6
+    )
+    .setTransactionMemo("Transfer 10.172691 * to 0.0.6189")
     .setMaxTransactionFee(new Hbar(1))
     .freezeWith(client);
 
@@ -172,24 +186,72 @@ async function handleAssociateToken(): Promise<void> {
   const tokenStore = useTokenStore();
   const tokenId = tokenStore.token;
   const client = await getClient();
+
+  const associateTx = new TokenAssociateTransaction()
+    .setTokenIds([tokenId!])
+    .setAccountId(client.operatorAccountId!)
+    .setMaxTransactionFee(new Hbar(1))
+    .setTransactionMemo(`Associate Token ${tokenId!.toString()}`)
+    .freezeWith(client);
+
+  console.log(associateTx);
+  console.log(associateTx.toBytes());
+
+  await associateTx.execute(client);
 }
 
 async function handleDissociateToken(): Promise<void> {
   const tokenStore = useTokenStore();
   const tokenId = tokenStore.token;
   const client = await getClient();
+
+  const dissociateTx = new TokenDissociateTransaction()
+    .setTokenIds([tokenId!])
+    .setAccountId(client.operatorAccountId!)
+    .setMaxTransactionFee(new Hbar(1))
+    .setTransactionMemo(`Dissociate ${tokenId!.toString()}`)
+    .freezeWith(client);
+
+  console.log(dissociateTx);
+  console.log(dissociateTx.toBytes());
+
+  await dissociateTx.execute(client);
 }
 
 async function handleMintToken(): Promise<void> {
   const tokenStore = useTokenStore();
   const tokenId = tokenStore.token;
   const client = await getClient();
+
+  const mintTx = new TokenMintTransaction()
+    .setAmount(10_555_666)
+    .setMaxTransactionFee(new Hbar(2))
+    .setTokenId(tokenId!)
+    .setTransactionMemo(`Mint 10.555666 ${tokenId!.toString()}`)
+    .freezeWith(client);
+
+  console.log(mintTx);
+  console.log(mintTx.toBytes());
+
+  await mintTx.execute(client);
 }
 
 async function handleBurnToken(): Promise<void> {
   const tokenStore = useTokenStore();
   const tokenId = tokenStore.token;
   const client = await getClient();
+
+  const burnTx = new TokenBurnTransaction()
+    .setAmount(10_555_666)
+    .setMaxTransactionFee(new Hbar(2))
+    .setTokenId(tokenId!)
+    .setTransactionMemo(`Burn 10.555666 ${tokenId!.toString()}`)
+    .freezeWith(client);
+
+  console.log(burnTx);
+  console.log(burnTx.toBytes());
+
+  await burnTx.execute(client);
 }
 </script>
 
@@ -204,7 +266,7 @@ async function handleBurnToken(): Promise<void> {
     <Button label="Transfer Hbar" @click="handleTransferHbar" />
     <Button label="Transfer Token" @click="handleTransferToken" />
     <Button label="Associate Token" @click="handleAssociateToken" />
-    <Button label="DissociateToken" @click="handleDissociateToken" />
+    <Button label="Dissociate Token" @click="handleDissociateToken" />
     <Button label="Mint Token" @click="handleMintToken" />
     <Button label="Burn Token" @click="handleBurnToken" />
   </div>
