@@ -1,16 +1,26 @@
 <script setup lang="ts">
 import {
   AccountId,
+  PrivateKey,
+  PublicKey,
+  TokenType,
   Client,
   TransferTransaction,
   Hbar,
   AccountCreateTransaction,
   AccountUpdateTransaction,
+  TokenCreateTransaction,
+  TokenSupplyType,
 } from "@hashgraph/sdk";
 import { Wallet } from "../ledger/wallet";
+import { useTokenStore } from "../stores/token";
 import { useWalletStore } from "../stores/wallet";
 
 const LEDGER_TEST_ACCOUNT = "0.0.47729388";
+const LEDGER_PUBLIC_KEY =
+  "bf4028caa14379a7cef89b0f86894880a6dc31281edf5d0081259d2d36ef01e1";
+const ACCOUNT_6189_PRIVATE_KEY =
+  "302e020100300506032b6570042204207f7ac6c8025a15ff1e07ef57c7295601379a4e9a526560790ae85252393868f0";
 const walletStore = useWalletStore();
 
 async function getClient(): Promise<Client> {
@@ -20,6 +30,33 @@ async function getClient(): Promise<Client> {
   const signer = walletStore.wallet?.getTransactionSigner(0);
   client.setOperatorWith(operator, publicKey!, signer!);
   return client;
+}
+
+async function handleCreateToken(): Promise<void> {
+  const tokenStore = useTokenStore();
+
+  const client = Client.forTestnet().setOperator(
+    AccountId.fromString("0.0.6189"),
+    PrivateKey.fromString(ACCOUNT_6189_PRIVATE_KEY)
+  );
+
+  const createTokenTx = new TokenCreateTransaction()
+    .setTokenName("STAR")
+    .setTokenSymbol("*")
+    .setTokenType(TokenType.FungibleCommon)
+    .setDecimals(6)
+    .setInitialSupply(200)
+    .setTreasuryAccountId(AccountId.fromString("0.0.6189"))
+    .setSupplyType(TokenSupplyType.Infinite)
+    .setAdminKey(PrivateKey.fromString(ACCOUNT_6189_PRIVATE_KEY))
+    .setSupplyKey(PublicKey.fromString(LEDGER_PUBLIC_KEY))
+    .freezeWith(client);
+
+  const executedTx = await createTokenTx.execute(client);
+  const receipt = await executedTx.getReceipt(client);
+
+  console.log(receipt);
+  tokenStore.token = receipt.tokenId;
 }
 
 function handleConnectWallet(): void {
@@ -113,30 +150,53 @@ async function handleTransferHbar(): Promise<void> {
   await transferTx.execute(client);
 }
 
-function handleTransferToken(): void {
-  console.log("handleTransferToken");
+async function handleTransferToken(): Promise<void> {
+  const tokenStore = useTokenStore();
+  const tokenId = tokenStore.token;
+  const client = await getClient();
+
+  const tokenTransferTx = new TransferTransaction()
+    .addTokenTransfer(tokenId!, AccountId.fromString("0.0.6189"), 10)
+    .addTokenTransfer(tokenId!, client.operatorAccountId!, -10)
+    .setTransactionMemo("Transfer 10 * to 0.0.6189")
+    .setMaxTransactionFee(new Hbar(1))
+    .freezeWith(client);
+
+  console.log(tokenTransferTx);
+  console.log(tokenTransferTx.toBytes());
+
+  await tokenTransferTx.execute(client);
 }
 
-function handleAssociateToken(): void {
-  console.log("handleAssociateToken");
+async function handleAssociateToken(): Promise<void> {
+  const tokenStore = useTokenStore();
+  const tokenId = tokenStore.token;
+  const client = await getClient();
 }
 
-function handleDissociateToken(): void {
-  console.log("handleDissociateToken");
+async function handleDissociateToken(): Promise<void> {
+  const tokenStore = useTokenStore();
+  const tokenId = tokenStore.token;
+  const client = await getClient();
 }
 
-function handleMintToken(): void {
-  console.log("handleMintToken");
+async function handleMintToken(): Promise<void> {
+  const tokenStore = useTokenStore();
+  const tokenId = tokenStore.token;
+  const client = await getClient();
 }
 
-function handleBurnToken(): void {
-  console.log("handleBurnToken");
+async function handleBurnToken(): Promise<void> {
+  const tokenStore = useTokenStore();
+  const tokenId = tokenStore.token;
+  const client = await getClient();
 }
 </script>
 
 <template>
   <div class="grid grid-cols-2">
     <Button label="Connect Wallet" @click="handleConnectWallet" />
+    <Button label="Create Token" @click="handleCreateToken" />
     <Button label="Verify Account" @click="handleVerifyAccount" />
     <Button label="Create Account" @click="handleCreateAccount" />
     <Button label="Stake to Node 3" @click="handleStakeNode" />
