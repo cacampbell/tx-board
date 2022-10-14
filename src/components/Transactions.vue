@@ -159,15 +159,20 @@ async function handleTransferToken(): Promise<void> {
   const tokenId = tokenStore.token;
   const client = await getClient();
 
+  if (tokenId == null) {
+    console.warn("Create Token First");
+    return;
+  }
+
   const tokenTransferTx = new TransferTransaction()
     .addTokenTransferWithDecimals(
-      tokenId!,
+      tokenId,
       AccountId.fromString("0.0.6189"),
       10_172_691,
       6
     )
     .addTokenTransferWithDecimals(
-      tokenId!,
+      tokenId,
       client.operatorAccountId!,
       -10_172_691,
       6
