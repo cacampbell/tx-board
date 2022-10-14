@@ -20,11 +20,14 @@ import { Wallet } from "../ledger/wallet";
 import { useTokenStore } from "../stores/token";
 import { useWalletStore } from "../stores/wallet";
 
-const LEDGER_TEST_ACCOUNT = "0.0.47729388";
-const LEDGER_PUBLIC_KEY =
-  "bf4028caa14379a7cef89b0f86894880a6dc31281edf5d0081259d2d36ef01e1";
-const ACCOUNT_6189_PRIVATE_KEY =
-  "302e020100300506032b6570042204207f7ac6c8025a15ff1e07ef57c7295601379a4e9a526560790ae85252393868f0";
+// Fill in from Ledger / External Account Create
+const LEDGER_TEST_ACCOUNT = "";
+const LEDGER_PUBLIC_KEY = "";
+
+// Can be any testnet account (that is not the ledger)
+const ACCOUNT_3386_PRIVATE_KEY =
+  "d345a9e51d4564e3391193c42eb26dfde1f45df0df96e5f0c3d10e1c7d778817";
+
 const walletStore = useWalletStore();
 
 async function getClient(): Promise<Client> {
@@ -40,8 +43,8 @@ async function handleCreateToken(): Promise<void> {
   const tokenStore = useTokenStore();
 
   const client = Client.forTestnet().setOperator(
-    AccountId.fromString("0.0.6189"),
-    PrivateKey.fromString(ACCOUNT_6189_PRIVATE_KEY)
+    AccountId.fromString("0.0.3386"),
+    PrivateKey.fromString(ACCOUNT_3386_PRIVATE_KEY)
   );
 
   const createTokenTx = new TokenCreateTransaction()
@@ -50,9 +53,9 @@ async function handleCreateToken(): Promise<void> {
     .setTokenType(TokenType.FungibleCommon)
     .setDecimals(6)
     .setInitialSupply(200)
-    .setTreasuryAccountId(AccountId.fromString("0.0.6189"))
+    .setTreasuryAccountId(AccountId.fromString("0.0.3386"))
     .setSupplyType(TokenSupplyType.Infinite)
-    .setAdminKey(PrivateKey.fromString(ACCOUNT_6189_PRIVATE_KEY))
+    .setAdminKey(PrivateKey.fromString(ACCOUNT_3386_PRIVATE_KEY))
     .setSupplyKey(PublicKey.fromString(LEDGER_PUBLIC_KEY))
     .freezeWith(client);
 
@@ -86,9 +89,11 @@ async function handleCreateAccount(): Promise<void> {
   const client = await getClient();
 
   const createTx = new AccountCreateTransaction()
-    .setInitialBalance(Hbar.fromTinybars(16_789))
-    .setKey(client.operatorPublicKey!)
-    .setTransactionMemo("New Account!")
+    .setInitialBalance(Hbar.fromTinybars(10_000))
+    .setKey(client._operator!.publicKey)
+    .setTransactionMemo(
+      `New Account for ${client._operator!.publicKey.toStringRaw()}`
+    )
     .setMaxTransactionFee(new Hbar(2))
     .freezeWith(client);
 
