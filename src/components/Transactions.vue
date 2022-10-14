@@ -21,8 +21,9 @@ import { useTokenStore } from "../stores/token";
 import { useWalletStore } from "../stores/wallet";
 
 // Fill in from Ledger / External Account Create
-const LEDGER_TEST_ACCOUNT = "";
-const LEDGER_PUBLIC_KEY = "";
+const LEDGER_TEST_ACCOUNT = "0.0.48622561";
+const LEDGER_PUBLIC_KEY =
+  "bf4028caa14379a7cef89b0f86894880a6dc31281edf5d0081259d2d36ef01e1";
 
 // Can be any testnet account (that is not the ledger)
 const ACCOUNT_3386_PRIVATE_KEY =
