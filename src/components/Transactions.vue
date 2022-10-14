@@ -128,9 +128,9 @@ async function handleStakeAccount(): Promise<void> {
 
   const stakeTx = new AccountUpdateTransaction()
     .setAccountId(operator!)
-    .setStakedAccountId(AccountId.fromString("0.0.6189"))
+    .setStakedAccountId(AccountId.fromString("0.0.3386"))
     .setDeclineStakingReward(false)
-    .setTransactionMemo("Stake to Account 6189")
+    .setTransactionMemo("Stake to Account 3386")
     .setMaxTransactionFee(new Hbar(1))
     .freezeWith(client);
 
@@ -145,10 +145,10 @@ async function handleTransferHbar(): Promise<void> {
   const operator = client.operatorAccountId;
 
   const transferTx = new TransferTransaction()
-    .setTransactionMemo("Transfer 10.156 Hbar to 0.0.6189")
+    .setTransactionMemo("Transfer 10.156 Hbar to 0.0.3386")
     .addHbarTransfer(operator!, new Hbar("-10.156"))
     .addHbarTransfer(
-      AccountId.fromString("0.0.6189"),
+      AccountId.fromString("0.0.3386"),
       Hbar.fromString("10.156")
     )
     .setMaxTransactionFee(new Hbar(2))
@@ -173,7 +173,7 @@ async function handleTransferToken(): Promise<void> {
   const tokenTransferTx = new TransferTransaction()
     .addTokenTransferWithDecimals(
       tokenId,
-      AccountId.fromString("0.0.6189"),
+      AccountId.fromString("0.0.3386"),
       10_172_691,
       6
     )
@@ -183,7 +183,7 @@ async function handleTransferToken(): Promise<void> {
       -10_172_691,
       6
     )
-    .setTransactionMemo("Transfer 10.172691 * to 0.0.6189")
+    .setTransactionMemo("Transfer 10.172691 * to 0.0.3386")
     .setMaxTransactionFee(new Hbar(1))
     .freezeWith(client);
 
@@ -273,7 +273,7 @@ async function handleBurnToken(): Promise<void> {
     <Button label="Verify Account" @click="handleVerifyAccount" />
     <Button label="Create Account" @click="handleCreateAccount" />
     <Button label="Stake to Node 3" @click="handleStakeNode" />
-    <Button label="Stake to Account 6189" @click="handleStakeAccount" />
+    <Button label="Stake to Account 3386" @click="handleStakeAccount" />
     <Button label="Transfer Hbar" @click="handleTransferHbar" />
     <Button label="Transfer Token" @click="handleTransferToken" />
     <Button label="Associate Token" @click="handleAssociateToken" />
