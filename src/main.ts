@@ -18,6 +18,6 @@ const store = createPinia();
 
 app.use(store);
 app.use(router);
-app.use(setupI18n(router));
+app.use(setupI18n());
 
 app.mount("#app");

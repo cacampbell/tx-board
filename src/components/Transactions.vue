@@ -21,7 +21,7 @@ import { useTokenStore } from "../stores/token";
 import { useWalletStore } from "../stores/wallet";
 
 // Fill in from Ledger / External Account Create
-const LEDGER_TEST_ACCOUNT = "0.0.48622561";
+const LEDGER_TEST_ACCOUNT = "0.0.47729388";
 const LEDGER_PUBLIC_KEY =
   "bf4028caa14379a7cef89b0f86894880a6dc31281edf5d0081259d2d36ef01e1";
 
@@ -90,11 +90,9 @@ async function handleCreateAccount(): Promise<void> {
   const client = await getClient();
 
   const createTx = new AccountCreateTransaction()
-    .setInitialBalance(Hbar.fromTinybars(10_000))
+    .setInitialBalance(Hbar.fromTinybars(100))
     .setKey(client._operator!.publicKey)
-    .setTransactionMemo(
-      `New Account for ${client._operator!.publicKey.toStringRaw()}`
-    )
+    .setTransactionMemo(`New Account`)
     .setMaxTransactionFee(new Hbar(2))
     .freezeWith(client);
 
